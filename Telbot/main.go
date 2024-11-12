@@ -1,11 +1,11 @@
 package main
 
 import (
-	"Telbot/budget"
 	"Telbot/debt"
 	"Telbot/purchase"
 	"github.com/tucnak/telebot"
 	"log"
+	"time"
 )
 
 func main() {
@@ -24,7 +24,8 @@ func main() {
 	purchase.RegisterHandlers(bot)       // Handles purchase-related commands
 	purchase.RegisterReportCommands(bot) // Handles reporting-related commands
 	//saving.RegisterHandlers(bot)
-	purchase.RegisterHandlers(bot)
-
+	purchase.SetBudget(bot)
+	purchase.CheckBudget(bot)
+	purchase.ViewBudget(bot)
 	bot.Start()
 }

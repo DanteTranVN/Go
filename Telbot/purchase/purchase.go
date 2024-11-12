@@ -11,7 +11,6 @@ import (
 	"time"
 )
 
-// Purchase struct to store purchase information with CreatedTime
 type Purchase struct {
 	IDTele      int
 	AccountName string
@@ -73,7 +72,6 @@ func LoadBudgets(userID int) ([]Budget, error) {
 func CalculateSpent(userID int, target string, period string) int {
 	purchases, err := loadPurchases()
 	if err != nil {
-		// Trả về 0 nếu không thể tải dữ liệu mua hàng
 		return 0
 	}
 
@@ -81,12 +79,9 @@ func CalculateSpent(userID int, target string, period string) int {
 	now := time.Now()
 
 	for _, purchase := range purchases {
-		// Lọc theo ID người dùng và mục tiêu
 		if purchase.IDTele == userID && purchase.Target == target {
-			// Kiểm tra xem giao dịch có thuộc khoảng thời gian chỉ định không
 			switch period {
 			case "week":
-				// Kiểm tra nếu giao dịch thuộc tuần hiện tại
 				weekAgo := now.AddDate(0, 0, -7)
 				if purchase.CreatedTime.After(weekAgo) {
 					totalSpent += purchase.Amount
@@ -110,9 +105,7 @@ func CalculateSpent(userID int, target string, period string) int {
 	return totalSpent
 }
 
-// RegisterHandlers registers purchase-related handlers to the bot
 func RegisterHandlers(bot *telebot.Bot) {
-	// Handle the /purchase command
 	bot.Handle("/purchase", func(m *telebot.Message) {
 		args := strings.SplitN(m.Payload, " ", 2)
 		if len(args) < 2 {
@@ -120,7 +113,6 @@ func RegisterHandlers(bot *telebot.Bot) {
 			return
 		}
 
-		// Parse the amount with suffix
 		amountString := strings.ToUpper(args[0])
 		multiplier := 1
 
@@ -268,7 +260,6 @@ func RegisterReportCommands(bot *telebot.Bot) {
 	})
 }
 
-// SaveBudget saves a new budget to the CSV file without using a global variable.
 func SaveBudget(budget Budget) error {
 	file, err := os.OpenFile("budgets.csv", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
@@ -317,11 +308,9 @@ func SetBudget(bot *telebot.Bot) {
 		}
 		amount *= multiplier
 
-		// Parse the category and duration
 		category := args[1]
 		duration := args[2]
 
-		// Create a Budget entry for the user
 		newBudget := Budget{
 			IDTele:    m.Sender.ID,
 			Category:  category,
@@ -340,7 +329,6 @@ func SetBudget(bot *telebot.Bot) {
 	})
 }
 
-// Hàm xử lý xem ngân sách của người dùng
 func ViewBudget(bot *telebot.Bot) {
 	bot.Handle("/viewBudget", func(m *telebot.Message) {
 		budgets, err := LoadBudgets(m.Sender.ID)
@@ -363,7 +351,6 @@ func ViewBudget(bot *telebot.Bot) {
 	})
 }
 
-// Hàm kiểm tra mức độ sử dụng ngân sách và cảnh báo khi gần vượt quá ngưỡng
 func CheckBudget(bot *telebot.Bot) {
 	bot.Handle("/checkBudget", func(m *telebot.Message) {
 		budgets, err := LoadBudgets(m.Sender.ID)
@@ -404,11 +391,9 @@ func CheckBudgetAlert(Id int) (string, error) {
 	}
 
 	for _, budget := range budgets {
-		// Tính tổng chi tiêu cho mục tiêu và khoảng thời gian này
 		spent := CalculateSpent(Id, budget.Category, budget.Duration)
 		percentageSpent := float64(spent) / float64(budget.Amount)
 
-		// Nếu chi tiêu vượt quá 50%, gửi cảnh báo
 		if percentageSpent >= 0.5 {
 			remaining := budget.Amount - spent
 			message := fmt.Sprintf("⚠️ Alert: You've spent %.2f%% of your %s budget for %s.\nRemaining amount: %s",

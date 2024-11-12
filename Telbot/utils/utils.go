@@ -4,8 +4,6 @@ import (
 	"fmt"
 )
 
-// CalculateSpent tính tổng số tiền chi tiêu cho một mục tiêu cụ thể trong một khoảng thời gian
-
 func FormatNumber(amount int) string {
 	millions := amount / 1_000_000
 	remainderAfterMillions := amount % 1_000_000
